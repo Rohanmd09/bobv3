@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Vertex Bank — App Concept</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0B1830">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root{
+    --bg-deep:#0B1830;
+    --bg-card-dark:#16244a;
+    --white:#FFFFFF;
+    --ink:#0F1B33;
+    --muted:#69748C;
+    --muted-2:#9AA5BD;
+    --muted-dark:#8B96B8;
+    --primary:#2455E6;
+    --primary-deep:#173CAE;
+    --coral:#FF5B6E;
+    --coral-deep:#E6415A;
+    --mint:#1FAE72;
+    --amber:#F5A623;
+    --font-display:'Poppins',sans-serif;
+    --font-body:'Inter',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font-body);
+    background:#2A3550;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+  }
+
+  .device{
+    width:100%;
+    max-width:430px;
+    min-height:100vh;
+    background:var(--bg-deep);
+    position:relative;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    box-shadow:0 0 60px rgba(0,0,0,0.35);
+  }
+  .statusbar{display:flex;justify-content:space-between;align-items:center;padding:14px 22px 4px;font-size:13px;font-weight:600;color:var(--white);flex:none;}
+  .statusbar .dots{display:flex;gap:5px;align-items:center;}
+
+  .topnav{display:flex;align-items:center;justify-content:space-between;padding:10px 18px 6px;flex:none;}
+  .topnav.light{background:var(--white);}
+  .topnav-left{display:flex;align-items:center;gap:12px;}
+  .back-btn{background:none;border:none;cursor:pointer;color:inherit;display:flex;padding:0;}
+  .topnav h2{margin:0;font-family:var(--font-display);font-size:17px;font-weight:600;}
+  .topnav .icons{display:flex;gap:10px;align-items:center;}
+  .icon-btn{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:none;border:none;color:inherit;padding:0;}
+  .topnav.dark .icon-btn{border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);}
+  .icon-btn .dot{position:absolute;top:5px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--coral);}
+
+  .home-header{padding:2px 18px 14px;flex:none;}
+  .home-header-row{display:flex;align-items:center;justify-content:space-between;}
+  .avatar-chip{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--primary);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;position:relative;}
+  .avatar-chip .status-dot{position:absolute;bottom:-2px;right:-2px;width:12px;height:12px;border-radius:50%;background:var(--primary);border:2px solid var(--bg-deep);}
+  .digipass-chip{display:flex;align-items:center;gap:6px;background:linear-gradient(90deg,#5B4FE0,#8A4FE0);color:#fff;padding:6px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+  .home-icons{display:flex;gap:8px;}
+
+  .acc-select-row{display:flex;align-items:center;justify-content:space-between;margin-top:18px;color:var(--white);font-size:13px;}
+  .acc-select-row .left{color:var(--muted-dark);display:flex;align-items:center;gap:5px;}
+  .acc-select-row .right{color:#7FA6FF;font-weight:600;text-decoration:none;font-size:12.5px;}
+
+  .balance-block{text-align:center;margin:24px 0 20px;color:var(--white);}
+  .balance-block .lbl{font-size:12px;color:var(--muted-dark);display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;}
+  .balance-block .lbl button{background:none;border:none;color:var(--muted-dark);cursor:pointer;display:flex;padding:0;}
+  .balance-block .amt{font-family:var(--font-display);font-size:32px;font-weight:700;margin-top:8px;}
+  .balance-block a{color:#7FA6FF;font-size:12.5px;font-weight:600;text-decoration:underline;display:inline-block;margin-top:6px;}
+
+  .util-row{display:flex;justify-content:space-around;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px 6px;margin:0 0 18px;}
+  .util-item{display:flex;flex-direction:column;align-items:center;gap:7px;color:var(--white);font-size:11.5px;font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font-body);position:relative;}
+  .util-item .ic{width:22px;height:22px;display:flex;align-items:center;justify-content:center;}
+  .util-item .ic svg{width:20px;height:20px;}
+  .util-item .ping{position:absolute;top:-2px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--coral);}
+
+  .content-dark{flex:1;overflow-y:auto;padding:0 18px 100px;color:var(--white);}
+  .content-light{flex:1;overflow-y:auto;padding:16px 18px 100px;background:var(--white);color:var(--ink);}
+
+  .section-title{display:flex;align-items:center;justify-content:space-between;margin:18px 0 12px;}
+  .section-title h3{font-family:var(--font-display);font-size:15px;margin:0;font-weight:600;}
+  .content-dark .section-title h3{color:var(--white);}
+  .section-title a{font-size:12.5px;color:var(--primary);text-decoration:none;font-weight:600;}
+  .content-dark .section-title a{color:#7FA6FF;}
+
+  .sheet{background:var(--white);color:var(--ink);border-radius:20px 20px 0 0;padding:20px 0 0;margin:0 -18px;position:relative;}
+  .sheet-handle{width:36px;height:4px;background:#D8DEEA;border-radius:3px;margin:0 auto 14px;}
+  .sheet-inner{padding:0 18px;}
+
+  .card-light{background:#F5F7FB;border-radius:14px;padding:16px;margin-bottom:12px;}
+
+  .bill-tile{background:var(--white);color:var(--ink);border-radius:16px;padding:16px;min-width:230px;flex:none;}
+  .bill-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px;margin:0 -0px 14px;}
+  .bill-top{display:flex;justify-content:space-between;align-items:flex-start;}
+  .bill-name{font-weight:700;font-size:14px;}
+  .bill-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .bill-logo{width:28px;height:28px;border-radius:8px;background:var(--coral);color:#fff;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .bill-link{font-size:11.5px;font-weight:700;color:var(--primary);margin-top:10px;display:block;}
+  .bill-link.issue{color:var(--coral-deep);}
+  .bill-amt{font-family:var(--font-display);font-size:19px;font-weight:700;margin-top:8px;}
+  .bill-due{font-size:11px;color:var(--muted-2);}
+  .btn-primary{background:var(--primary);color:#fff;border:none;border-radius:11px;padding:12px 14px;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;font-family:var(--font-body);margin-top:10px;}
+  .btn-primary:disabled{opacity:0.45;cursor:not-allowed;}
+  .btn-outline{background:transparent;border-radius:11px;padding:11px 14px;font-weight:700;font-size:13.5px;cursor:pointer;width:100%;font-family:var(--font-body);}
+  .btn-outline.on-dark{border:1.5px solid rgba(255,255,255,0.35);color:#fff;}
+  .btn-outline.on-light{border:1.5px solid var(--primary);color:var(--primary);}
+
+  .row-between{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+
+  .tab-toggle{display:flex;gap:22px;border-bottom:1px solid rgba(255,255,255,0.12);margin-bottom:18px;}
+  .content-light .tab-toggle{border-bottom:1px solid #E4E8F1;}
+  .tab-toggle button{background:none;border:none;padding:0 0 10px;font-size:14px;font-weight:600;color:var(--muted-dark);border-bottom:2.5px solid transparent;cursor:pointer;font-family:var(--font-body);}
+  .content-light .tab-toggle button{color:var(--muted);}
+  .tab-toggle button.active{color:var(--white);border-color:var(--primary);}
+  .content-light .tab-toggle button.active{color:var(--ink);}
+
+  .deposit-total{margin-bottom:16px;}
+  .deposit-total .label{font-size:12px;color:var(--muted-dark);font-weight:600;}
+  .deposit-total .amt{font-family:var(--font-display);font-weight:700;font-size:27px;margin-top:4px;}
+  .fd-scroll{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px;margin-bottom:16px;}
+  .fd-tile{flex:none;width:150px;background:var(--bg-card-dark);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:14px;}
+  .fd-tile .emoji{font-size:20px;}
+  .fd-tile .fd-label{font-size:12px;color:var(--muted-dark);margin-top:8px;}
+  .fd-tile .fd-val{font-weight:700;font-size:14px;margin-top:3px;}
+  .fd-tile button{margin-top:12px;width:100%;background:transparent;border:1px solid rgba(255,255,255,0.35);color:#fff;border-radius:8px;padding:7px 0;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font-body);}
+
+  .stat-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid #EEF1F7;font-size:13px;}
+  .stat-row:last-child{border-bottom:none;}
+  .stat-row .k{color:var(--muted);}
+  .stat-row .v{font-weight:700;}
+  .stat-row.highlight .k, .stat-row.highlight .v{color:var(--mint);}
+
+  .credit-card-visual{background:linear-gradient(135deg,var(--primary-deep),var(--primary));border-radius:16px;color:#fff;padding:18px;margin-bottom:14px;min-height:110px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;}
+  .credit-card-visual::after{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.08);}
+  .credit-card-visual .cc-name{font-weight:700;font-size:14px;}
+  .credit-card-visual .cc-num{letter-spacing:3px;font-size:13px;margin-top:20px;opacity:0.85;}
+  .points-row{display:flex;gap:10px;margin-top:14px;}
+  .points-box{flex:1;background:#FFF8E9;border-radius:12px;padding:12px;display:flex;align-items:center;gap:10px;}
+  .points-box .num{font-weight:800;font-size:12.5px;}
+  .points-box a{font-size:11.5px;color:var(--primary);text-decoration:none;font-weight:700;}
+  .manage-box{width:70px;background:#F4F6FB;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10.5px;font-weight:700;color:var(--ink);}
+
+  .txn-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.08);}
+  .content-light .txn-row{border-bottom:1px solid #EEF1F7;}
+  .txn-row:last-child{border-bottom:none;}
+  .txn-left{display:flex;align-items:center;gap:10px;}
+  .txn-ic{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:none;}
+  .txn-name{font-size:13px;font-weight:700;}
+  .txn-sub{font-size:11px;color:var(--muted-dark);margin-top:2px;}
+  .content-light .txn-sub{color:var(--muted);}
+  .txn-amt{font-weight:700;font-size:13.5px;}
+  .txn-amt.credit{color:var(--mint);}
+
+  .payee-card{display:flex;align-items:center;gap:12px;padding:14px;background:#F4F6FB;border-radius:14px;margin-bottom:18px;}
+  .payee-avatar{width:38px;height:38px;border-radius:50%;background:var(--coral);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .payee-name{font-weight:700;font-size:14px;}
+  .payee-sub{font-size:11.5px;color:var(--muted);margin-top:2px;}
+  .amount-input{text-align:center;margin:6px 0 4px;}
+  .amount-input .amt{font-family:var(--font-display);font-size:34px;font-weight:700;}
+  .amount-input .words{font-size:12px;color:var(--muted);margin-top:2px;}
+  .mode-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0;}
+  .mode-tile{border:1.5px solid #E4E8F1;border-radius:12px;padding:12px 8px;text-align:center;font-size:13px;font-weight:700;cursor:pointer;position:relative;background:#fff;font-family:var(--font-body);}
+  .mode-tile.selected{border-color:var(--primary);background:#F0F4FF;}
+  .mode-tile .tag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);background:var(--amber);color:#5A3A00;font-size:9px;font-weight:800;padding:2px 7px;border-radius:8px;}
+  .mode-tile .sub{font-size:10.5px;color:var(--mint);font-weight:600;margin-top:2px;}
+  .paying-from{background:#F4F6FB;border-radius:14px;padding:14px;margin:10px 0 16px;}
+  .paying-from .bank-row{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13.5px;}
+  .paying-from .acc-row{font-size:12px;color:var(--muted);margin-top:8px;}
+  .paying-from .bal-row{font-size:12px;color:var(--muted);margin-top:3px;}
+  .tnc-row{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--muted);margin-bottom:16px;}
+  .tnc-row a{color:var(--primary);font-weight:600;text-decoration:none;}
+  .error-text{color:var(--coral-deep);font-size:12px;font-weight:600;margin:-8px 0 14px;text-align:center;display:none;}
+
+  .profile-hero{text-align:center;padding:4px 0 10px;color:var(--white);}
+  .profile-avatar{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:22px;margin:0 auto 10px;position:relative;}
+  .profile-avatar .edit-dot{position:absolute;bottom:0;right:0;width:22px;height:22px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;border:2px solid var(--bg-deep);}
+  .profile-name{font-family:var(--font-display);font-weight:700;font-size:16px;}
+  .profile-tier{font-size:11.5px;color:var(--muted-dark);margin-top:2px;}
+  .id-row{display:flex;justify-content:space-around;margin-top:16px;font-size:12px;}
+  .id-row .lbl{color:var(--muted-dark);}
+  .id-row .val{font-weight:700;margin-top:2px;}
+  .field-row{padding:13px 0;border-bottom:1px solid #EEF1F7;display:flex;justify-content:space-between;align-items:center;}
+  .field-row:last-child{border-bottom:none;}
+  .field-row .fk{font-size:11.5px;color:var(--muted);}
+  .field-row .fv{font-size:13.5px;font-weight:600;margin-top:3px;}
+  .field-row a{color:var(--primary);font-size:12.5px;font-weight:700;text-decoration:none;}
+
+  .statement-card{background:#EEF2FF;border-radius:14px;padding:16px;margin-top:6px;}
+  .statement-card h4{margin:0 0 4px;font-family:var(--font-display);font-size:13.5px;}
+  .statement-card p{margin:0 0 12px;font-size:11.5px;color:var(--muted);}
+  .statement-row{display:flex;gap:8px;}
+  .statement-row select{flex:1;border:1px solid #D8DEEA;border-radius:9px;padding:9px;font-size:12.5px;font-family:var(--font-body);background:#fff;}
+
+  .bottom-nav{position:absolute;left:0;right:0;bottom:0;background:var(--white);border-top:1px solid #E9ECF4;display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom,0px));z-index:10;}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;color:var(--muted-2);font-size:10.5px;font-weight:600;cursor:pointer;font-family:var(--font-body);padding:4px 0;}
+  .nav-item.active{color:var(--primary);}
+  .nav-item svg{width:21px;height:21px;}
+
+  .screen{display:none;}
+  .screen.active{display:flex;flex-direction:column;flex:1;min-height:0;animation:fadein .25s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .overlay{position:absolute;inset:0;background:#fff;z-index:20;display:none;flex-direction:column;}
+  .overlay.active{display:flex;}
+  .overlay-header{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid #EEF1F7;flex:none;}
+  .overlay-header button{background:none;border:none;cursor:pointer;padding:0;display:flex;color:var(--ink);}
+  .overlay-header h3{margin:0;font-family:var(--font-display);font-size:16px;font-weight:600;flex:1;}
+  .overlay-header .side-icons{display:flex;gap:12px;color:var(--muted);}
+  .overlay-body{padding:18px;overflow-y:auto;flex:1;}
+  .pay-step{display:none;}
+  .pay-step.active{display:block;animation:fadein .2s ease;}
+
+  ::-webkit-scrollbar{width:0;height:0;}
+  .badge-note{text-align:center;font-size:10.5px;color:var(--muted-2);margin:16px 0 8px;letter-spacing:0.2px;}
+  .content-dark .badge-note{color:var(--muted-dark);}
+
+  /* PIN pad step */
+  .pin-wrap{text-align:center;padding:30px 10px 10px;}
+  .pin-wrap h3{font-family:var(--font-display);font-size:16px;margin:0 0 6px;}
+  .pin-wrap p{font-size:12.5px;color:var(--muted);margin:0 0 22px;}
+  .pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:30px;}
+  .pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid #D8DEEA;}
+  .pin-dot.filled{background:var(--primary);border-color:var(--primary);}
+  .pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:260px;margin:0 auto;}
+  .pin-key{padding:16px 0;border-radius:14px;background:#F4F6FB;border:none;font-size:18px;font-weight:700;font-family:var(--font-body);cursor:pointer;color:var(--ink);}
+  .pin-key.empty{background:transparent;cursor:default;}
+
+  /* processing step */
+  .processing-wrap{text-align:center;padding:60px 20px;}
+  .spinner{width:52px;height:52px;border:4px solid #E4E8F1;border-top-color:var(--primary);border-radius:50%;margin:0 auto 22px;animation:spin 0.9s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .processing-wrap h3{font-family:var(--font-display);font-size:15.5px;margin:0 0 6px;}
+  .processing-wrap p{font-size:12.5px;color:var(--muted);margin:0;}
+
+  /* result step */
+  .result-wrap{text-align:center;padding:36px 10px 10px;}
+  .result-icon{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;}
+  .result-icon.success{background:#E4F7ED;color:var(--mint);}
+  .result-icon.pending{background:#FFF3DF;color:#B9780B;}
+  .result-icon.fail{background:#FFE9EC;color:var(--coral-deep);}
+  .result-wrap h3{font-family:var(--font-display);font-size:18px;margin:0 0 6px;}
+  .result-wrap .amt{font-family:var(--font-display);font-size:26px;font-weight:700;margin:10px 0 4px;}
+  .result-wrap .sub{font-size:12.5px;color:var(--muted);margin-bottom:24px;}
+  .result-detail{background:#F5F7FB;border-radius:14px;padding:14px 16px;text-align:left;margin-bottom:20px;}
+  .result-detail .r{display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;}
+  .result-detail .r span:first-child{color:var(--muted);}
+  .result-detail .r span:last-child{font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="device" id="device">
+
+  <div class="statusbar">
+    <span>10:00</span>
+    <div class="dots">
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 9L8 2L15 9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none"><path d="M1 3C4 0 12 0 15 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><path d="M4 6C6.5 4 9.5 4 12 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="10" r="1.1" fill="currentColor"/></svg>
+      <svg width="20" height="11" viewBox="0 0 20 11" fill="none"><rect x="1" y="1" width="16" height="9" rx="2" stroke="currentColor" stroke-width="1"/><rect x="2.5" y="2.5" width="12" height="6" fill="currentColor"/><rect x="18" y="3.5" width="1.5" height="4" fill="currentColor"/></svg>
+    </div>
+  </div>
+
+  <!-- ============ HOME ============ -->
+  <div class="screen active" id="screen-home">
+    <div class="home-header">
+      <div class="home-header-row">
+        <div class="avatar-chip">R<div class="status-dot"></div></div>
+        <div class="digipass-chip">◆ Net Worth</div>
+        <div class="home-icons">
+          <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><div class="dot"></div>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+          </button>
+          <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          </button>
+          <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 11-12.8 0"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="acc-select-row">
+        <div class="left">Savings A/c: •••• •••• 7734 ⌄</div>
+        <a href="#" class="right" onclick="showScreen('accsummary');return false;">Manage A/c</a>
+      </div>
+      <div class="balance-block">
+        <div class="lbl">
+          <span id="balanceLabel">View Balance</span>
+          <button onclick="toggleBalance()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        </div>
+        <div class="amt" id="balanceAmount" style="display:none;">₹5,69,624.50</div>
+        <a href="#" onclick="showScreen('accsummary');return false;">View statement ⌄</a>
+      </div>
+      <div class="util-row">
+        <button class="util-item" onclick="showScreen('cards')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></div>Cards</button>
+        <button class="util-item" onclick="showScreen('deposits')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>Deposits</button>
+        <button class="util-item" onclick="showScreen('accsummary')"><div class="ping"></div><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18"/><path d="M5 21V10l7-6 7 6v11"/><path d="M9 21v-6h6v6"/></svg></div>Loans</button>
+        <button class="util-item" onclick="showScreen('deposits')"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 17l5-5 4 4 7-8"/><path d="M14 8h5v5"/></svg></div>Invest</button>
+      </div>
+    </div>
+
+    <div class="content-dark" style="padding-bottom:0;flex:1;display:flex;flex-direction:column;">
+      <div class="sheet" style="flex:1;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-inner">
+          <div class="row-between" style="margin-bottom:16px;">
+            <h3 style="font-family:var(--font-display);font-size:15px;margin:0;">Payment Centre</h3>
+            <span style="font-size:11px;color:var(--muted);">UPI: riy••••21@vertex</span>
+          </div>
+          <div class="card-light" style="margin-bottom:16px;">
+            <div class="row-between">
+              <div>
+                <div style="font-weight:700;font-size:14px;">Send Money</div>
+                <div style="font-size:11.5px;color:var(--muted);margin-top:4px;">via NEFT, IMPS, RTGS, UPI &amp; within Vertex Bank</div>
+              </div>
+              <button class="btn-outline on-light" style="width:auto;padding:8px 14px;font-size:12px;" onclick="openSendMoney()">+ New payee</button>
+            </div>
+          </div>
+          <button class="btn-primary" onclick="openSendMoney()" style="margin-top:0;">Enter UPI ID / Mobile no. / Account no. / Name</button>
+
+          <div class="section-title" style="margin-top:20px;"><h3>Quick Actions</h3></div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;text-align:center;">
+            <button class="util-item" style="color:var(--ink);" onclick="openSendMoney()"><div class="ic" style="background:#E7EEFF;border-radius:12px;width:44px;height:44px;color:var(--primary);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM19 14h2v2h-2zM14 19h2v2h-2zM19 19h2v2h-2z"/></svg></div>Scan &amp; Pay</button>
+            <button class="util-item" style="color:var(--ink);" onclick="showScreen('bills')"><div class="ic" style="background:#FFE9EC;border-radius:12px;width:44px;height:44px;color:var(--coral-deep);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg></div>Pay Bills</button>
+            <button class="util-item" style="color:var(--ink);" onclick="showScreen('profile')"><div class="ic" style="background:#E4F7ED;border-radius:12px;width:44px;height:44px;color:var(--mint);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3l4 4-4 4"/><path d="M21 7H9a4 4 0 00-4 4v1"/><path d="M7 21l-4-4 4-4"/><path d="M3 17h12a4 4 0 004-4v-1"/></svg></div>Self Transfer</button>
+          </div>
+
+          <div class="section-title" style="margin-top:20px;"><h3>Recent Transactions</h3></div>
+          <div id="recentTxnList">
+            <div class="txn-row">
+              <div class="txn-left">
+                <div class="txn-ic" style="background:#E4F7ED;color:var(--mint);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div>
+                <div><div class="txn-name">Salary Credit</div><div class="txn-sub">27 Jul · Sample Employer</div></div>
+              </div>
+              <div class="txn-amt credit">+ ₹85,000.00</div>
+            </div>
+            <div class="txn-row">
+              <div class="txn-left">
+                <div class="txn-ic" style="background:#FFE9EC;color:var(--coral-deep);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></div>
+                <div><div class="txn-name">Mobile Postpaid</div><div class="txn-sub">12 Jul · Bill payment</div></div>
+              </div>
+              <div class="txn-amt">- ₹749.48</div>
+            </div>
+          </div>
+          <div class="badge-note" style="color:var(--muted);">Sample data shown for concept preview only</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ BILLS ============ -->
+  <div class="screen" id="screen-bills">
+    <div class="topnav dark" style="color:#fff;">
+      <div class="topnav-left"><div class="avatar-chip" style="width:28px;height:28px;font-size:11px;">R</div></div>
+      <div class="icons">
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><div class="dot"></div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+      </div>
+    </div>
+    <div class="content-dark" style="padding-top:8px;flex:1;display:flex;flex-direction:column;">
+      <div class="section-title"><h3>My Bills (3)</h3><a href="#" onclick="return false;">View all ›</a></div>
+      <div class="bill-scroll">
+        <div class="bill-tile">
+          <div class="bill-top">
+            <div><div class="bill-name">Mobile Postpaid</div><div class="bill-sub">Riya's Mobile · +91 98••• ••210</div></div>
+            <div class="bill-logo">VB</div>
+          </div>
+          <a href="#" class="bill-link" onclick="return false;">Set up AutoPay</a>
+          <div class="bill-amt">₹749.48</div>
+          <div class="bill-due">Due · Feb 15</div>
+          <button class="btn-primary" style="background:var(--primary);color:#fff;">Pay Now</button>
+        </div>
+        <div class="bill-tile">
+          <div class="bill-top">
+            <div><div class="bill-name">Electricity Bill</div><div class="bill-sub">Home Connection</div></div>
+            <div class="bill-logo" style="background:var(--amber);">EB</div>
+          </div>
+          <a href="#" class="bill-link issue" onclick="return false;">AutoPay issue ⚠</a>
+          <div class="bill-amt">₹1,240.00</div>
+          <div class="bill-due">Due · Feb 18</div>
+          <button class="btn-primary" style="background:var(--primary);color:#fff;">Pay Now</button>
+        </div>
+      </div>
+      <button class="btn-outline on-dark">+ Pay New Bill</button>
+
+      <div class="sheet" style="flex:1;margin-top:18px;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-inner">
+          <input type="text" placeholder="Search by Bill Name / Nickname" style="width:100%;padding:12px 14px;border-radius:12px;border:1px solid #E4E8F1;font-size:13px;font-family:var(--font-body);margin-bottom:14px;">
+          <div style="display:flex;gap:10px;">
+            <div style="flex:1;background:#EEF1FF;border-radius:12px;padding:12px;">
+              <div style="font-size:12.5px;font-weight:700;">Never miss a due date</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Turn on AutoPay for all bills</div>
+            </div>
+            <div style="flex:1;background:#FFF3DF;border-radius:12px;padding:12px;">
+              <div style="font-size:12.5px;font-weight:700;">Earn up to ₹1,800</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:4px;">Cashback on bill payments</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ ACCOUNT SUMMARY (light) ============ -->
+  <div class="screen" id="screen-accsummary">
+    <div class="topnav light">
+      <div class="topnav-left">
+        <button class="back-btn" onclick="showScreen('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <h2>Accounts</h2>
+      </div>
+      <a href="#" onclick="return false;" style="font-size:12.5px;color:var(--primary);font-weight:700;text-decoration:none;">Manage limits</a>
+    </div>
+    <div class="content-light">
+      <div class="card-light" style="background:#fff;border:1px solid #EEF1F7;">
+        <div style="font-size:12px;color:var(--muted);font-weight:600;">Current Account •••• 4123</div>
+        <a href="#" onclick="return false;" style="font-size:12.5px;font-weight:700;color:var(--primary);text-decoration:none;display:inline-block;margin-top:8px;">View account details</a>
+      </div>
+      <div class="card-light" style="background:#fff;border:1px solid #EEF1F7;">
+        <div class="stat-row"><span class="k">Account Balance</span><span class="v" id="stmtAccBalance">₹5,69,624.50</span></div>
+        <div class="stat-row"><span class="k">Overdraft Limit (Super Saver)</span><span class="v">₹1,000.00</span></div>
+        <div class="stat-row"><span class="k">Uncleared Amount</span><span class="v">₹1,000.00</span></div>
+        <div class="stat-row"><span class="k">Amount on Hold</span><span class="v">₹3,000.00</span></div>
+        <div class="stat-row highlight"><span class="k">Net Available Balance</span><span class="v">₹3,000.00</span></div>
+        <div class="stat-row"><span class="k">Monthly Average Balance Req.</span><span class="v">₹2,500.00</span></div>
+        <div class="stat-row"><span class="k">Available Sweep-In (FDs)</span><span class="v">₹5,000.00</span></div>
+      </div>
+
+      <div class="statement-card">
+        <h4>Download Account Statement</h4>
+        <p>Choose a period to generate a sample statement (mock data, PDF).</p>
+        <div class="statement-row">
+          <select id="stmtPeriod">
+            <option>Last 1 Month</option>
+            <option>Last 3 Months</option>
+            <option>Last 6 Months</option>
+            <option>Custom Range</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="downloadStatement()">⭳ Download Statement</button>
+      </div>
+      <div class="badge-note">Sample statement contains mock transactions only</div>
+    </div>
+  </div>
+
+  <!-- ============ DEPOSITS ============ -->
+  <div class="screen" id="screen-deposits">
+    <div class="topnav dark" style="color:#fff;">
+      <div class="topnav-left"><h2>Deposits</h2></div>
+      <div class="icons">
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><div class="dot"></div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+      </div>
+    </div>
+    <div class="content-dark" style="padding-top:8px;flex:1;display:flex;flex-direction:column;">
+      <div class="tab-toggle">
+        <button class="active" onclick="setDepTab(this)">Fixed Deposit</button>
+        <button onclick="setDepTab(this)">Recurring Deposit</button>
+      </div>
+      <div class="deposit-total">
+        <div class="label">Total Deposit Amount</div>
+        <div class="amt">₹42,00,000.00</div>
+      </div>
+      <div class="fd-scroll">
+        <div class="fd-tile"><div class="emoji">🐷</div><div class="fd-label">2 Regular FDs</div><div class="fd-val">₹42,00,000.00</div><button>Open New</button></div>
+        <div class="fd-tile"><div class="emoji">💰</div><div class="fd-label">TaxSaver FDs</div><div class="fd-val">@6.5% for 5 yrs</div><button>Open New</button></div>
+      </div>
+      <button class="btn-primary" style="margin-bottom:12px;">+ Open FD</button>
+      <div style="text-align:center;"><a href="#" onclick="return false;" style="font-size:12.5px;color:#7FA6FF;font-weight:600;text-decoration:underline;">View FD interest rates</a></div>
+
+      <div class="sheet" style="flex:1;margin-top:18px;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-inner">
+          <div class="section-title" style="margin-top:0;"><h3>My Deposits (5)</h3><a href="#" onclick="downloadFDSummary();return false;">⭳ FD summary</a></div>
+          <div class="card-light">
+            <div class="row-between">
+              <div><div style="font-weight:700;font-size:13.5px;">Regular FD</div><div style="font-size:11.5px;color:var(--muted);margin-top:3px;">•••• 1212</div></div>
+              <div style="font-weight:700;font-size:13.5px;">₹21,00,000</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ CARDS ============ -->
+  <div class="screen" id="screen-cards">
+    <div class="topnav dark" style="color:#fff;">
+      <div class="topnav-left"><h2>Cards</h2></div>
+      <div class="icons">
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><div class="dot"></div><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></button>
+        <button class="icon-btn" style="border:1px solid rgba(255,255,255,0.18);background:rgba(255,255,255,0.05);color:#fff;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></button>
+      </div>
+    </div>
+    <div class="content-dark" style="padding-top:6px;flex:1;display:flex;flex-direction:column;">
+      <div style="font-size:12px;color:var(--mint);font-weight:700;display:flex;align-items:center;gap:6px;">● Active ⌄</div>
+      <div class="sheet" style="flex:1;margin-top:14px;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-inner">
+          <h3 style="font-family:var(--font-display);font-size:15px;margin:0 0 12px;">Credit Card</h3>
+          <div class="credit-card-visual">
+            <div class="cc-name">Vertex Privilege Card</div>
+            <div class="cc-num">•••• •••• •••• 4432</div>
+          </div>
+          <div class="row-between" style="margin-bottom:14px;">
+            <div>
+              <div style="font-size:11.5px;color:var(--muted);">Due on Feb 12</div>
+              <div style="font-weight:700;font-size:15px;margin-top:3px;">₹3,500.00 <span style="font-size:11px;color:var(--muted);font-weight:500;">Min Due</span></div>
+            </div>
+            <button class="btn-primary" style="width:auto;padding:10px 18px;margin-top:0;">Pay Now</button>
+          </div>
+          <a href="#" onclick="return false;" style="display:block;font-size:12.5px;font-weight:600;color:var(--ink);border-top:1px solid #EEF1F7;border-bottom:1px solid #EEF1F7;padding:12px 0;text-decoration:none;">Upgrade to <b>Intermiles Card</b> ›</a>
+          <div class="points-row">
+            <div class="points-box"><div>👑</div><div><div class="num">2,412 Points Earned</div><a href="#" onclick="return false;">Redeem now ›</a></div></div>
+            <div class="manage-box">⚙️ Manage</div>
+          </div>
+          <div class="card-light" style="margin-top:16px;">
+            <div class="row-between"><div style="font-weight:700;font-size:13.5px;">Rewards Credit Card</div><span style="color:var(--muted-2);">›</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PROFILE ============ -->
+  <div class="screen" id="screen-profile">
+    <div class="topnav dark" style="color:#fff;">
+      <div class="topnav-left">
+        <button class="back-btn" style="color:#fff;" onclick="showScreen('home')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <h2>My Profile</h2>
+      </div>
+      <button class="icon-btn" style="color:#fff;">⋮</button>
+    </div>
+    <div class="content-dark" style="flex:1;display:flex;flex-direction:column;">
+      <div class="profile-hero">
+        <div class="profile-avatar">R<div class="edit-dot">✎</div></div>
+        <div class="profile-name">Riya Malhotra</div>
+        <div class="profile-tier">Imperia Customer</div>
+        <div class="id-row">
+          <div><div class="lbl">Customer ID</div><div class="val">123••••78 ⌄</div></div>
+          <div><div class="lbl">User ID</div><div class="val">rm••••234</div></div>
+        </div>
+      </div>
+      <div class="sheet" style="flex:1;margin-top:16px;">
+        <div class="sheet-handle"></div>
+        <div class="sheet-inner">
+          <div class="tab-toggle">
+            <button class="active" onclick="setProfTab(this)">Personal Details</button>
+            <button onclick="setProfTab(this)">KYC</button>
+          </div>
+          <div class="field-row"><div><div class="fk">Email ID</div><div class="fv">r•••••••a@gmail.com</div></div><a href="#" onclick="return false;">Update</a></div>
+          <div class="field-row"><div><div class="fk">Registered Mobile Number</div><div class="fv">••••• 2210</div></div></div>
+          <div class="field-row"><div><div class="fk">Residence Phone Number</div><div class="fv">••••• 8834</div></div></div>
+          <div class="field-row"><div><div class="fk">Office Phone Number</div><div class="fv">••••• 0091</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SEND MONEY OVERLAY ============ -->
+  <div class="overlay" id="overlay-sendMoney">
+    <div class="overlay-header">
+      <button onclick="closeSendMoney()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+      <h3 id="sendMoneyTitle">Send Money To</h3>
+      <div class="side-icons">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 000-7.8z"/></svg>
+      </div>
+    </div>
+    <div class="overlay-body">
+
+      <!-- STEP 1: details / mode -->
+      <div class="pay-step active" id="pay-step-details">
+        <div class="payee-card">
+          <div class="payee-avatar">A</div>
+          <div><div class="payee-name">Aman Kapoor</div><div class="payee-sub">Vertex Bank · Savings •••• 5521</div></div>
+        </div>
+        <div class="amount-input">
+          <div class="amt">₹ <span id="txnAmountDisplay">14,000</span></div>
+          <div class="words">Fourteen thousand rupees only</div>
+        </div>
+        <div class="error-text" id="insufficientError">Insufficient balance for this transfer</div>
+
+        <div style="font-size:12.5px;font-weight:700;color:var(--muted);margin-top:6px;">Payment Mode</div>
+        <div class="mode-row">
+          <div class="mode-tile selected" id="mode-NEFT" onclick="selectMode('NEFT')">NEFT<div class="sub">Within 4 hrs</div></div>
+          <div class="mode-tile" id="mode-UPI" onclick="selectMode('UPI')">UPI<div class="sub">No cost</div></div>
+          <div class="mode-tile" id="mode-IMPS" onclick="selectMode('IMPS')">IMPS<span class="tag">Instant</span></div>
+        </div>
+
+        <div style="font-size:11px;font-weight:700;color:var(--muted-2);letter-spacing:0.3px;">PAYING FROM</div>
+        <div class="paying-from">
+          <div class="bank-row">
+            <div style="width:20px;height:20px;"><svg viewBox="0 0 32 32" fill="none"><polygon points="16,2 29,9 29,23 16,30 3,23 3,9" fill="#2455E6"/><polygon points="16,8 23,12 23,20 16,24 9,20 9,12" fill="#FF5B6E"/></svg></div>
+            Vertex Bank ⌄
+          </div>
+          <div class="acc-row">Savings A/c: •••• •••• 7734</div>
+          <div class="bal-row">Balance: <span id="payFromBalance">₹5,69,624.50</span></div>
+        </div>
+
+        <div class="tnc-row"><input type="checkbox" id="tncCheck" checked> I have read &amp; understood the <a href="#" onclick="return false;">Terms &amp; Conditions</a></div>
+        <button class="btn-primary" id="proceedBtn" style="margin-top:0;" onclick="proceedFromDetails()">Confirm &amp; Send via NEFT</button>
+        <div class="badge-note">Mock flow with sample data — no real transaction occurs</div>
+      </div>
+
+      <!-- STEP 2: UPI PIN (only for UPI) -->
+      <div class="pay-step" id="pay-step-pin">
+        <div class="pin-wrap">
+          <h3>Enter UPI PIN</h3>
+          <p>To authorise ₹<span id="pinAmountDisplay">14,000</span> to Aman Kapoor</p>
+          <div class="pin-dots" id="pinDots">
+            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+          </div>
+          <div class="pin-pad">
+            <button class="pin-key" onclick="pressPin('1')">1</button>
+            <button class="pin-key" onclick="pressPin('2')">2</button>
+            <button class="pin-key" onclick="pressPin('3')">3</button>
+            <button class="pin-key" onclick="pressPin('4')">4</button>
+            <button class="pin-key" onclick="pressPin('5')">5</button>
+            <button class="pin-key" onclick="pressPin('6')">6</button>
+            <button class="pin-key" onclick="pressPin('7')">7</button>
+            <button class="pin-key" onclick="pressPin('8')">8</button>
+            <button class="pin-key" onclick="pressPin('9')">9</button>
+            <button class="pin-key empty"></button>
+            <button class="pin-key" onclick="pressPin('0')">0</button>
+            <button class="pin-key" onclick="pressPin('back')">⌫</button>
+          </div>
+          <div class="badge-note">Any 4 digits work — this is a mock PIN pad, nothing is verified</div>
+        </div>
+      </div>
+
+      <!-- STEP 3: processing -->
+      <div class="pay-step" id="pay-step-processing">
+        <div class="processing-wrap">
+          <div class="spinner"></div>
+          <h3 id="processingModeText">Processing via NEFT…</h3>
+          <p>Please don't close this screen</p>
+        </div>
+      </div>
+
+      <!-- STEP 4: result -->
+      <div class="pay-step" id="pay-step-result">
+        <div class="result-wrap">
+          <div class="result-icon" id="resultIcon">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>
+          </div>
+          <h3 id="resultTitle">Money Sent!</h3>
+          <div class="amt" id="resultAmount">₹14,000</div>
+          <div class="sub" id="resultSub">to Aman Kapoor via NEFT</div>
+          <div class="result-detail">
+            <div class="r"><span>Reference No.</span><span id="resultRef">—</span></div>
+            <div class="r"><span>Date &amp; Time</span><span id="resultTime">—</span></div>
+            <div class="r"><span>Mode</span><span id="resultMode">—</span></div>
+            <div class="r"><span>Status</span><span id="resultStatus">—</span></div>
+          </div>
+          <button class="btn-outline on-light" style="margin-bottom:10px;" onclick="downloadReceipt()">⭳ Download Receipt</button>
+          <button class="btn-primary" style="margin-top:0;" onclick="closeSendMoney()">Done</button>
+          <div class="badge-note">Mock transaction — sample data only, not a real bank record</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ============ BOTTOM NAV ============ -->
+  <div class="bottom-nav">
+    <button class="nav-item active" data-screen="home" onclick="navTo(this,'home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/></svg>Home</button>
+    <button class="nav-item" data-screen="bills" onclick="navTo(this,'bills')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>Bills</button>
+    <button class="nav-item" data-screen="deposits" onclick="navTo(this,'deposits')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Deposits</button>
+    <button class="nav-item" data-screen="cards" onclick="navTo(this,'cards')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Cards</button>
+    <button class="nav-item" data-screen="profile" onclick="navTo(this,'profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4.5 5-6 8-6s6.5 1.5 8 6"/></svg>Profile</button>
+  </div>
+
+</div>
+
+<script>
+  /* ---------------- state ---------------- */
+  let balance = 569624.50;
+  let balanceVisible = false;
+  let selectedMode = 'NEFT';
+  const txnAmount = 14000;
+  const payeeName = 'Aman Kapoor';
+  let pinEntry = '';
+  let lastTxn = null;
+
+  function fmtINR(n){
+    return '₹' + n.toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  /* ---------------- balance toggle ---------------- */
+  function toggleBalance(){
+    balanceVisible = !balanceVisible;
+    document.getElementById('balanceAmount').style.display = balanceVisible ? 'block' : 'none';
+    document.getElementById('balanceAmount').textContent = fmtINR(balance);
+    document.getElementById('balanceLabel').textContent = balanceVisible ? 'Account Balance' : 'View Balance';
+  }
+
+  /* ---------------- screen nav ---------------- */
+  function showScreen(name){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById('screen-'+name).classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    const navBtn = document.querySelector('.nav-item[data-screen="'+name+'"]');
+    if(navBtn) navBtn.classList.add('active');
+  }
+  function navTo(btn,name){ showScreen(name); }
+
+  function setDepTab(btn){ btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+  function setProfTab(btn){ btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+
+  /* ---------------- send money flow ---------------- */
+  function openSendMoney(){
+    resetPayFlow();
+    document.getElementById('overlay-sendMoney').classList.add('active');
+  }
+  function closeSendMoney(){
+    document.getElementById('overlay-sendMoney').classList.remove('active');
+    resetPayFlow();
+  }
+  function resetPayFlow(){
+    selectedMode = 'NEFT';
+    pinEntry = '';
+    document.querySelectorAll('.mode-tile').forEach(t=>t.classList.remove('selected'));
+    document.getElementById('mode-NEFT').classList.add('selected');
+    document.getElementById('proceedBtn').textContent = 'Confirm & Send via NEFT';
+    document.getElementById('insufficientError').style.display = 'none';
+    document.getElementById('payFromBalance').textContent = fmtINR(balance);
+    goToStep('details');
+    updatePinDots();
+  }
+  function goToStep(step){
+    document.querySelectorAll('.pay-step').forEach(s=>s.classList.remove('active'));
+    document.getElementById('pay-step-'+step).classList.add('active');
+  }
+
+  function selectMode(mode){
+    selectedMode = mode;
+    document.querySelectorAll('.mode-tile').forEach(t=>t.classList.remove('selected'));
+    document.getElementById('mode-'+mode).classList.add('selected');
+    document.getElementById('proceedBtn').textContent = 'Confirm & Send via ' + mode;
+  }
+
+  function proceedFromDetails(){
+    const tncChecked = document.getElementById('tncCheck').checked;
+    if(!tncChecked){ return; }
+    if(txnAmount > balance){
+      document.getElementById('insufficientError').style.display = 'block';
+      return;
+    }
+    document.getElementById('insufficientError').style.display = 'none';
+    if(selectedMode === 'UPI'){
+      pinEntry = '';
+      updatePinDots();
+      document.getElementById('pinAmountDisplay').textContent = txnAmount.toLocaleString('en-IN');
+      goToStep('pin');
+    } else {
+      startProcessing();
+    }
+  }
+
+  function updatePinDots(){
+    const dots = document.querySelectorAll('#pinDots .pin-dot');
+    dots.forEach((d,i)=> d.classList.toggle('filled', i < pinEntry.length));
+  }
+  function pressPin(key){
+    if(key === 'back'){ pinEntry = pinEntry.slice(0,-1); updatePinDots(); return; }
+    if(pinEntry.length >= 4) return;
+    pinEntry += key;
+    updatePinDots();
+    if(pinEntry.length === 4){
+      setTimeout(()=> startProcessing(), 350);
+    }
+  }
+
+  function startProcessing(){
+    const modeLabelMap = { NEFT:'Processing via NEFT…', UPI:'Verifying with UPI…', IMPS:'Processing via IMPS…' };
+    document.getElementById('processingModeText').textContent = modeLabelMap[selectedMode];
+    goToStep('processing');
+    setTimeout(()=> finishPayment(), 1400);
+  }
+
+  function finishPayment(){
+    const now = new Date();
+    const ref = selectedMode.slice(0,1) + Math.floor(100000000 + Math.random()*899999999);
+    const isNEFT = selectedMode === 'NEFT';
+    const status = isNEFT ? 'Pending' : 'Success';
+
+    if(!isNEFT){
+      balance -= txnAmount;
+    }
+    // NEFT shown as pending — balance reflects on confirmation (deduct anyway so summary stays consistent)
+    if(isNEFT){ balance -= txnAmount; }
+
+    document.getElementById('balanceAmount').textContent = fmtINR(balance);
+    document.getElementById('stmtAccBalance').textContent = fmtINR(balance);
+
+    lastTxn = {
+      ref, mode:selectedMode, amount:txnAmount, payee:payeeName,
+      time: now.toLocaleString('en-IN', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+      status
+    };
+
+    const icon = document.getElementById('resultIcon');
+    const title = document.getElementById('resultTitle');
+    if(isNEFT){
+      icon.className = 'result-icon pending';
+      icon.innerHTML = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>';
+      title.textContent = 'Transfer Initiated';
+    } else {
+      icon.className = 'result-icon success';
+      icon.innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg>';
+      title.textContent = 'Money Sent!';
+    }
+    document.getElementById('resultAmount').textContent = '₹' + txnAmount.toLocaleString('en-IN');
+    document.getElementById('resultSub').textContent = 'to ' + payeeName + ' via ' + selectedMode;
+    document.getElementById('resultRef').textContent = ref;
+    document.getElementById('resultTime').textContent = lastTxn.time;
+    document.getElementById('resultMode').textContent = selectedMode;
+    document.getElementById('resultStatus').textContent = status + (isNEFT ? ' (within 4 hrs)' : '');
+
+    addRecentTransaction(lastTxn);
+    goToStep('result');
+  }
+
+  function addRecentTransaction(t){
+    const list = document.getElementById('recentTxnList');
+    const row = document.createElement('div');
+    row.className = 'txn-row';
+    row.innerHTML = `
+      <div class="txn-left">
+        <div class="txn-ic" style="background:#FFE9EC;color:var(--coral-deep);"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M19 12l-7 7-7-7"/></svg></div>
+        <div><div class="txn-name">${t.mode} to ${t.payee}</div><div class="txn-sub">${t.time} · ${t.status}</div></div>
+      </div>
+      <div class="txn-amt">- ₹${t.amount.toLocaleString('en-IN')}</div>
+    `;
+    list.prepend(row);
+  }
+
+  /* ---------------- PDF: statement / FD summary / receipt ---------------- */
+  function downloadStatement(){
+    const period = document.getElementById('stmtPeriod').value;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const rows = [
+      ['05 Jul 2026','Salary Credit — Sample Employer','+ 85,000.00', fmtINR(balance+83609.02).replace('₹','')],
+      ['08 Jul 2026','UPI — Grocery Store (sample)','- 2,340.00','—'],
+      ['12 Jul 2026','Mobile Postpaid Bill (sample)','- 749.48','—'],
+      ['22 Jul 2026','FD Interest Credit (sample)','+ 3,120.00','—'],
+      ['27 Jul 2026','Salary Credit — Sample Employer','+ 85,000.00','—']
+    ];
+    if(lastTxn){
+      rows.push([lastTxn.time, lastTxn.mode+' to '+lastTxn.payee+' (sample)', '- '+lastTxn.amount.toLocaleString('en-IN')+'.00', fmtINR(balance).replace('₹','')]);
+    }
+    doc.setFontSize(16); doc.setTextColor(36,85,230);
+    doc.text('Vertex Bank — Sample Statement', 14, 18);
+    doc.setFontSize(10); doc.setTextColor(100);
+    doc.text('Account: Savings •••• 7734  |  Period: ' + period, 14, 26);
+    doc.setTextColor(230,65,90);
+    doc.text('SAMPLE DATA — for design concept preview only. Not a real bank record.', 14, 33);
+    let y = 46;
+    doc.setTextColor(15,27,51);
+    doc.setFontSize(10);
+    doc.text('Date', 14, y); doc.text('Description', 46, y); doc.text('Amount (Rs)', 128, y); doc.text('Balance (Rs)', 162, y);
+    y += 4;
+    doc.setDrawColor(220); doc.line(14, y, 196, y);
+    y += 6;
+    rows.forEach(r=>{
+      doc.text(String(r[0]), 14, y);
+      doc.text(String(r[1]), 46, y);
+      doc.text(String(r[2]), 128, y);
+      doc.text(String(r[3]), 162, y);
+      y += 8;
+    });
+    doc.setFontSize(8.5); doc.setTextColor(150);
+    doc.text('Generated from a design concept — figures are illustrative mock data.', 14, y+8);
+    doc.save('vertex-bank-sample-statement.pdf');
+  }
+
+  function downloadFDSummary(){
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16); doc.setTextColor(36,85,230);
+    doc.text('Vertex Bank — Sample FD Summary', 14, 18);
+    doc.setTextColor(230,65,90); doc.setFontSize(10);
+    doc.text('SAMPLE DATA — for design concept preview only.', 14, 27);
+    doc.setTextColor(15,27,51);
+    let y = 42;
+    const fds = [
+      ['Regular FD •••• 1212','Rs 21,00,000.00','6.10% p.a.','12 Mar 2027'],
+      ['Regular FD •••• 1340','Rs 21,00,000.00','6.10% p.a.','04 Sep 2027']
+    ];
+    doc.setFontSize(10);
+    doc.text('FD Account', 14, y); doc.text('Principal', 80, y); doc.text('Rate', 130, y); doc.text('Maturity', 160, y);
+    y += 4; doc.setDrawColor(220); doc.line(14,y,196,y); y+=6;
+    fds.forEach(f=>{ doc.text(f[0],14,y); doc.text(f[1],80,y); doc.text(f[2],130,y); doc.text(f[3],160,y); y+=8; });
+    doc.save('vertex-bank-sample-fd-summary.pdf');
+  }
+
+  function downloadReceipt(){
+    if(!lastTxn) return;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.setFontSize(16); doc.setTextColor(36,85,230);
+    doc.text('Vertex Bank — Payment Receipt (Sample)', 14, 20);
+    doc.setTextColor(230,65,90); doc.setFontSize(10);
+    doc.text('SAMPLE DATA — no real transaction occurred.', 14, 28);
+    doc.setTextColor(15,27,51); doc.setFontSize(11);
+    let y = 44;
+    const rows = [
+      ['Reference No.', lastTxn.ref],
+      ['Payee', lastTxn.payee],
+      ['Amount', 'Rs ' + lastTxn.amount.toLocaleString('en-IN')],
+      ['Mode', lastTxn.mode],
+      ['Status', lastTxn.status],
+      ['Date & Time', lastTxn.time],
+      ['From Account', 'Savings •••• 7734']
+    ];
+    rows.forEach(r=>{ doc.text(r[0]+':', 14, y); doc.text(String(r[1]), 80, y); y += 10; });
+    doc.setFontSize(8.5); doc.setTextColor(150);
+    doc.text('Generated from a design concept — figures are illustrative mock data.', 14, y+6);
+    doc.save('vertex-bank-sample-receipt-'+lastTxn.ref+'.pdf');
+  }
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load', ()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+  }
+</script>
+
+</body>
+</html>
