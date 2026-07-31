@@ -1,8 +1,8 @@
 [{
-  "relation": ["delegate_permission/common.handle_all_urls"],
-  "target": {
-    "namespace": "android_app",
-    "package_name": "REPLACE_WITH_YOUR_PACKAGE_NAME",
-    "sha256_cert_fingerprints": ["REPLACE_WITH_YOUR_SHA256_FINGERPRINT"]
-  }
-}]
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "app.vercel.bobv3.twa",
+        "sha256_cert_fingerprints": ["82:56:22:01:BF:6C:4F:52:91:3E:50:7C:BE:2D:46:08:4D:C0:3E:06:6C:92:40:54:09:5A:6C:DD:D0:E9:31:B0"]
+      }
+    }]
