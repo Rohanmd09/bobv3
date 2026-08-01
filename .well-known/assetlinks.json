@@ -3,6 +3,6 @@
       "target": {
         "namespace": "android_app",
         "package_name": "app.vercel.bobv3.twa",
-        "sha256_cert_fingerprints": ["D8:B5:15:63:02:C5:3F:D8:7A:82:7F:42:D6:31:20:F9:75:03:F8:9E:CF:1C:8A:84:1D:BE:E8:C6:C8:35:BD:42"]
+        "sha256_cert_fingerprints": ["9A:26:DF:7C:C4:5D:EA:93:88:7B:72:34:A7:A9:4C:58:8C:4A:34:40:2F:58:75:B7:6F:41:0F:AC:02:BC:35:1E"]
       }
     }]
