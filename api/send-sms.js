@@ -6,7 +6,6 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // Protect the endpoint
   if (req.headers['x-api-key'] !== process.env.SMS_API_KEY) {
     return res.status(401).json({ error: 'Unauthorized' });
   }
@@ -21,7 +20,7 @@ export default async function handler(req, res) {
     const apiKey   = process.env.TEXTBEE_API_KEY;
 
     if (!deviceId || !apiKey) {
-      throw new Error('Textbee credentials missing');
+      throw new Error('Textbee credentials missing on server');
     }
 
     const response = await fetch(
