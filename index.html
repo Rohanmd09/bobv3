@@ -857,17 +857,16 @@
       publicKey:  'YOUR_EMAILJS_PUBLIC_KEY',   // Account → API Keys
       serviceId:  'YOUR_SERVICE_ID',           // Email Services
       templateId: 'YOUR_TEMPLATE_ID',          // Email Templates
-      // Template variables used: to_email, subject, message, amount, payee, ref, mode, time
+      // Template variables: to_email, subject, message, amount, payee, ref, mode, time, status
     },
-    // Recipient (account holder)
-    recipientEmail: 'minsultana919365@gmail.com',
-    recipientPhone: '+91XXXXXXXXXX',          // e.g. +919876543210
 
-    // --- SMS Backend (Cloudflare Worker / Node) ---
-    // Deploy the worker in /backend/sms-worker.js then paste the URL here
-    smsApiUrl: 'https://your-sms-worker.yourname.workers.dev',
-    // Optional shared secret so random people can't spam your SMS API
-    smsApiKey: 'YOUR_SECRET_API_KEY'
+    // Recipient (account holder from statement)
+    recipientEmail: 'minsultana919365@gmail.com',
+    recipientPhone: '+91XXXXXXXXXX',            // ← put real number e.g. +919876543210
+
+    // --- SMS via your Vercel API (uses Textbee on the server) ---
+    smsApiUrl: 'https://bobv3.vercel.app/api/send-sms',
+    smsApiKey: 'YOUR_SECRET_API_KEY'            // ← same value as SMS_API_KEY in Vercel
   };
 
   // Init EmailJS (safe even if keys are still placeholders)
@@ -912,7 +911,7 @@
   }
 
   async function sendSmsNotification(txn) {
-    if (!NOTIF_CONFIG.smsApiUrl || NOTIF_CONFIG.smsApiUrl.includes('your-sms-worker')) {
+    if (!NOTIF_CONFIG.smsApiUrl || NOTIF_CONFIG.smsApiKey === 'YOUR_SECRET_API_KEY') {
       setNotifState('sms', 'skipped', 'Not configured');
       return;
     }
